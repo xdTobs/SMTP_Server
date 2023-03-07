@@ -33,8 +33,8 @@ public class SMTPConnection {
 	/* SMTP handshake. We need the name of the local machine.
 	   Send the appropriate SMTP handshake command. */
 
-        String localhost = "helo example.com";
-        sendCommand(localhost);
+        String localhost = "HELO example.com";
+        sendCommand(localhost,250);
 
         isConnected = true;
     }
@@ -43,6 +43,8 @@ public class SMTPConnection {
        correct order. No checking for errors, just throw them to the
        caller. */
     public void send(Envelope envelope) throws IOException {
+
+
         /* Fill in */
 	/* Send all the necessary commands to send a message. Call
 	   sendCommand() to do the dirty work. Do _not_ catch the
@@ -55,8 +57,8 @@ public class SMTPConnection {
     public void close() {
         isConnected = false;
         try {
-            sendCommand( /* Fill in */ );
-            // connection.close();
+            sendCommand("quit",221);
+            connection.close();
         } catch (IOException e) {
             System.out.println("Unable to close connection: " + e);
             isConnected = true;
@@ -64,28 +66,26 @@ public class SMTPConnection {
     }
 
     /* Send an SMTP command to the server. Check that the reply code is
-       what is is supposed to be according to RFC 821. */
-    private void sendCommand(String command, int rc) throws IOException {
-        /* Fill in */
-        /* Write command to server and read reply from server. */
-        /* Fill in */
+       what it is supposed to be according to RFC 821. */
+    private void sendCommand(String command, int expectedRC) throws IOException {
 
-        /* Fill in */
-	/* Check that the server's reply code is the same as the parameter
-	   rc. If not, throw an IOException. */
-        /* Fill in */
+        toServer.write(command.getBytes());
+        toServer.flush();
+        char[] rcBuff = new char[3];
+        fromServer.read(rcBuff,0,3);
+
+        int rc = Integer.parseInt(new String(rcBuff));
+
+        if(rc!=expectedRC)
+            throw new IOException("excpected different RC");
     }
 
     /* Parse the reply line from the server. Returns the reply code. */
     private int parseReply(String reply) {
         /* Fill in */
+        return 0;
     }
 
     /* Destructor. Closes the connection if something bad happens. */
-    protected void finalize() throws Throwable {
-        if(isConnected) {
-            close();
-        }
-        super.finalize();
-    }
+
 }
